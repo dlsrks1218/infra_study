@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "bash_ssh_conf_4_CentOS.sh"
   end
 
-  # Manager (manager)
+  # Manager (manager) - 도커 프라이빗 레지스트리
   config.vm.define:"manager" do |cfg|
     cfg.vm.box = "centos/7"
     cfg.vm.provider:virtualbox do |vb|
