@@ -1,0 +1,56 @@
+-- 1
+select concat(first_name, ' ', last_name) as 'Name', job_id as 'Job', salary as 'Salary', (12 * salary + 100) as 'Increased Ann_Salary', 12 * (salary + 100) as 'Increased Salary' from employees e ;
+-- 2
+select concat(last_name, ' : 1 Year Salary = $', salary) as '1 Year Salary' from employees;
+-- 3
+select concat(first_name, ' ', last_name) as 'Name', salary, job_id, commission_pct from employees order by salary desc, commission_pct desc;
+-- 4
+select employee_id, concat(first_name, ' ', last_name) as 'Name', salary, round(1.123 * salary) as 'Increased Salary' from employees;
+-- 5
+select concat(UCASE(MID(first_name,1,1)),MID(first_name,2), ' ', UCASE(MID(last_name,1,1)),MID(last_name,2), ' is a ', upper(job_id)) as 'Employee JOBs.' from employees where last_name in (select last_name from employees where last_name like '%s');
+-- 6
+select concat(first_name, ' ', last_name) as 'Name', if(ISNULL(commission_pct), salary , (salary + salary * commission_pct)) as 'Salary', if(ISNULL(commission_pct), 'Salary Only', 'Salary + Commission') as 'Commision Existence' from employees order by salary desc;
+-- 7
+select concat('$', cast(lpad(sum(salary), 6, 0) as signed)) as '급여 합', concat('$', cast(lpad(avg(salary), 6, 0) as signed)) as '급여 평균', concat('$', cast(lpad(max(salary), 6, 0) as signed)) as '급여 최대값', concat('$', cast(lpad(min(salary), 6, 0) as signed)) as '급여 최소값' from employees where department_id is not null group by department_id order by department_id;
+-- 8
+select job_id, avg(salary) from employees where job_id not like '%CLERK%' group by job_id having avg(salary) > 10000 order by avg(salary) desc;
+-- 9
+select 'Han-Bit' as 'Company Name', concat(first_name, ' ', last_name) as 'Name', job_id, department_name, city from employees e, departments d, locations l where e.department_id=d.department_id and d.location_id=l.location_id;
+-- 10
+select department_name, count(*) from departments d, employees e where d.department_id=e.department_id group by e.department_id order by count(*) desc;
+-- 11
+select concat(e.first_name, ' ', e.last_name) as 'Name', e.job_id, d.department_name, e.hire_date, e.salary, (select grade_level from job_grades where e.salary between lowest_sal and highest_sal) as 'Salary Grade'
+from employees e, departments d
+where e.department_id=d.department_id;
+-- 12
+select concat(e.first_name, ' ', e.last_name) as 'Name', e.job_id, e.salary from employees e where e.last_name like '%TUCKER%';
+-- 13
+select concat(e1.first_name, ' ', e1.last_name) as 'Name', e1.job_id, e1.salary, e1.hire_date from employees e1 where e1.salary = (select min(e2.salary) from employees e2 where e1.job_id=e2.job_id group by e2.job_id);
+-- 14
+select concat(e.first_name, ' ', e.last_name) as 'Name', e.job_id, e.salary from employees e
+where e.salary >= (select avg(salary) from employees e1 where e.department_id=e1.department_id group by department_id);
+-- 15
+select e.employee_id, concat(e.first_name, ' ', e.last_name) as 'Name', job_id, e.hire_date from employees e, departments d, locations l
+where e.department_id=d.department_id and d.location_id=l.location_id and l.city like 'O%';
+-- 16
+select e.employee_id, concat(e.first_name, ' ', e.last_name) as 'Name', e.job_id, e.salary, d.department_id, (select avg(salary) from employees e1 where e.department_id=e1.department_id group by department_id) as 'Deparment Avg Salary' from employees e, departments d where e.department_id=d.department_id;
+-- 17
+select e.employee_id, e.job_id from employees e, job_history h where e.employee_id=h.employee_id and e.job_id=h.job_id;
+-- 18
+select max(h.start_date) as '업무 이력 변경 날짜' from employees e, job_history h where e.employee_id=h.employee_id and e.employee_id=176;
+-- 19
+select sum(salary) as '부서별 급여 합계',
+       case when sum(salary) > 100000 then 'Excellent'
+           when sum(salary) > 50000 then 'Good'
+           when sum(salary) > 10000 then 'Medium'
+           when sum(salary) <= 100000 then 'Well'
+else sum(salary)
+END "급여 수준"
+from employees
+group by department_id;
+-- 20
+select concat(e.first_name, ' ', e.last_name) as 'Name', e.hire_date, e.job_id, e.salary * 1.15 as '인상된 연봉' from employees e where job_id like '%MGR%' and DATE_FORMAT(hire_date, '%Y') < 2005
+UNION
+select concat(e.first_name, ' ', e.last_name) as 'Name', e.hire_date, e.job_id, e.salary * 1.25 as '인상된 연봉' from employees e where job_id like '%MGR%' and DATE_FORMAT(hire_date, '%Y') >= 2005
+UNION
+select concat(e.first_name, ' ', e.last_name) as 'Name', e.hire_date, e.job_id, e.salary * 1.2  as '인상된 연봉' from employees e where job_id like '%MAN%' and DATE_FORMAT(hire_date, '%Y') < 2005;
